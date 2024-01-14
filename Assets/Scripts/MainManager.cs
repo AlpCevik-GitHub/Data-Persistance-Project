@@ -3,25 +3,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
+
+    public static MainManager Instance;
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
-    public Text ScoreText;
+   
+   
+    public TextMeshProUGUI scoreText;
+    public Button backToMenu;
+    public TextMeshProUGUI nameText;
     public GameObject GameOverText;
-    
+    public TextMeshProUGUI bestScoreText;
+
     private bool m_Started = false;
-    private int m_Points;
+    private int m_Points = 0;
     
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
+
+        backToMenu.interactable = false;
+        backToMenu.gameObject.SetActive(false);
+
+           if(DataHolder.Instance != null)
+        {
+
+            if (MenuUIHandler.playerName.Equals(DataHolder.Instance.playerName))
+            {
+                nameText.SetText("Name: " + DataHolder.Instance.playerName);
+                bestScoreText.SetText("Best Score : " + DataHolder.Instance.bestScore);
+            }else
+            {
+                DataHolder.Instance.playerName = MenuUIHandler.playerName;
+                nameText.SetText("Name: " + DataHolder.Instance.playerName);
+                DataHolder.Instance.bestScore = 0;
+                bestScoreText.SetText("Best Score : " + DataHolder.Instance.bestScore);
+            }
+
+                
+            
+            
+        }
+            
+       
+            
+        
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -65,12 +102,21 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        scoreText.SetText("Score : "+ m_Points);
+        
+        
+       
     }
 
     public void GameOver()
     {
+        DataHolder.Instance.bestScore += m_Points;
         m_GameOver = true;
         GameOverText.SetActive(true);
+        backToMenu.interactable = true;
+        backToMenu.gameObject.SetActive(true);
     }
+
+   
+
 }
